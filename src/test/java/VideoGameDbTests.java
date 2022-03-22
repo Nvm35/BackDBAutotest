@@ -1,6 +1,8 @@
 import config.VideoGameConfig;
 import config.VideoGamesEndpoints;
 import org.junit.Test;
+import static org.hamcrest.Matchers.lessThan;
+
 
 import static io.restassured.RestAssured.*;
 
@@ -78,9 +80,28 @@ public class VideoGameDbTests extends VideoGameConfig {
     public void getSingleGame() {
         given()
                 .pathParam("videoGameId", 5).
-        when()
+                when()
                 .get(VideoGamesEndpoints.SINGLE_VIDEOGAME).
-        then();
+                then();
     }
 
+    @Test
+    public void testVideoGameSerializationByJson() {
+        VideoGame videoGame = new VideoGame("90", "2020", "Mario", "88", "24", "Adult");
+        given()
+                .body(videoGame).
+                when().post(VideoGamesEndpoints.ALL_VIDEOGAMES).
+                then();
+    }
+
+    @Test
+    public void capruteResponseTime() {
+        long respTime=get(VideoGamesEndpoints.ALL_VIDEOGAMES).time();
+        System.out.println(respTime);
+    }
+
+    @Test
+    public void assertRespTime() {
+        when().get(VideoGamesEndpoints.ALL_VIDEOGAMES).then().time(lessThan(1000L));
+    }
 }
